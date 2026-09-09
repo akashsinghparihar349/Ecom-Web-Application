@@ -52,7 +52,8 @@ export default function Address() {
       let response = await fetch(`${import.meta.env.VITE_APP_BACKEND_SERVER}/user/${localStorage.getItem("userid")}`, {
         method: "PUT",
         headers: {
-          "content-type": "application/json"
+          "content-type": "application/json",
+          authorization:localStorage.getItem("token")
         },
         body: JSON.stringify({ ...data })
       })
