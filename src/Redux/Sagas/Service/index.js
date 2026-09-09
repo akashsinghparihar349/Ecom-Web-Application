@@ -37,21 +37,57 @@ export async function createMultipartRecord(collection, payload) {
 }
 
 //GET Record
+// export async function getRecord(collection) {
+//     try {
+//         let url = `${import.meta.env.VITE_APP_BACKEND_SERVER}/${collection}`
+//         if ((collection === "cart" || collection === "wishlist") || (collection === "checkout" && localStorage.getItem("role") === "Buyer"))
+//             url = `${import.meta.env.VITE_APP_BACKEND_SERVER}/${collection}/user/${localStorage.getItem("userid")}`
+//         let response = await fetch(url, {
+//             method: "GET",
+//             headers: {
+//                 "content-type": "application/json",
+//                 "authorization": localStorage.getItem("token") || import.meta.env.VITE_APP_JWT_PUBLIC_KEY
+
+//             }
+//         })
+//         response = await response.json()
+//         return response.data
+//     } catch (error) {
+//         console.log(error)
+//         return []
+//     }
+// }
+
 export async function getRecord(collection) {
     try {
         let url = `${import.meta.env.VITE_APP_BACKEND_SERVER}/${collection}`
-        if ((collection === "cart" || collection === "wishlist") || (collection === "checkout" && localStorage.getItem("role") === "Buyer"))
+
+        if (
+            collection === "cart" ||
+            collection === "wishlist" ||
+            (collection === "checkout" && localStorage.getItem("role") === "Buyer")
+        ) {
             url = `${import.meta.env.VITE_APP_BACKEND_SERVER}/${collection}/user/${localStorage.getItem("userid")}`
-        let response = await fetch(url, {
+        }
+
+        let options = {
             method: "GET",
             headers: {
-                "content-type": "application/json",
-                "authorization": localStorage.getItem("token") || import.meta.env.VITE_APP_JWT_PUBLIC_KEY
-
+                "content-type": "application/json"
             }
-        })
+        }
+
+        // Sirf token hone par authorization bhejo
+        if (localStorage.getItem("token")) {
+            options.headers.authorization = localStorage.getItem("token")
+        }
+
+        let response = await fetch(url, options)
+
         response = await response.json()
+
         return response.data
+
     } catch (error) {
         console.log(error)
         return []
