@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
 
@@ -59,9 +59,9 @@ export default function ShopPage() {
         let ch = option ? option?.toLocaleLowerCase() : search?.toLocaleLowerCase()
         let items = ProductStateData.filter(x => x.status && (
             (x.name?.toLocaleLowerCase()?.includes(ch)) ||
-            (x.maincategory?.toLocaleLowerCase() === ch) ||
-            (x.subcategory?.toLocaleLowerCase() === ch) ||
-            (x.brand?.toLocaleLowerCase() === ch) ||
+            (x.maincategory?.name?.toLocaleLowerCase() === ch) ||
+            (x.subcategory?.name?.toLocaleLowerCase() === ch) ||
+            (x.brand?.name?.toLocaleLowerCase() === ch) ||
             (x.color?.includes(ch)) ||
             (x.description?.toLocaleLowerCase()?.includes(ch))
         ))
@@ -77,11 +77,11 @@ export default function ShopPage() {
 
     function applySelectFilter(selected) {
         let items = ProductStateData.filter(x => x.status && (
-            (selected.maincategory?.length === 0 || selected.maincategory?.includes(x.maincategory)) &&
-            (selected.subcategory?.length === 0 || selected.subcategory?.includes(x.subcategory)) &&
-            (selected.brand?.length === 0 || selected.brand?.includes(x.brand)) &&
-            (selected.color?.length === 0 || new Set(selected.color).intersection(new Set(x.color)).size > 0) &&
-            (selected.size?.length === 0 || new Set(selected.size).intersection(new Set(x.size)).size > 0)
+            (selected.maincategory?.length === 0 || selected.maincategory?.includes(x.maincategory?.name)) &&
+            (selected.subcategory?.length === 0 || selected.subcategory?.includes(x.subcategory?.name)) &&
+            (selected.brand?.length === 0 || selected.brand?.includes(x.brand?.name)) &&
+            (selected.color?.length === 0 || selected.color.some(color => x.color?.some(c => c.toLowerCase() === color.toLowerCase()))) &&
+            (selected.size?.length === 0 || selected.size.some(size => x.size?.some(c => c.toLowerCase() === size.toLowerCase())))
         ))
         setSearch("")
         applySortFilter(sortFilter, items)
@@ -136,14 +136,17 @@ export default function ShopPage() {
             applySearchFilter(searchParams.get("search"))
         else {
             let selectItems = {
-                maincategory: searchParams.get("mc") || "",
-                subcategory: searchParams.get("sc") || "",
-                brand: searchParams.get("br") || ""
+                ...selected,
+                maincategory: searchParams.get("mc") ? [searchParams.get("mc")] : [],
+                subcategory: searchParams.get("sc") ? [searchParams.get("sc")] : [],
+                brand: searchParams.get("br") ? [searchParams.get("br")] : []
             }
             setSelected({ ...selected, ...selectItems })
             applySelectFilter({ ...selected, ...selectItems })
         }
     }, [searchParams])
+
+
     return (
         <>
             <Breadcrum title="Shop" />
